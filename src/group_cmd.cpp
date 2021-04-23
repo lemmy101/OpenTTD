@@ -17,12 +17,17 @@
 #include "autoreplace_func.h"
 #include "string_func.h"
 #include "company_func.h"
+#include "depot_base.h"
 #include "core/pool_func.hpp"
 #include "order_backup.h"
 
 #include "table/strings.h"
 
 #include "safeguards.h"
+#include "station_base.h"
+#include "strings_func.h"
+#include "town.h"
+#include "townname_func.h"
 
 GroupID _new_group_id;
 
@@ -661,6 +666,264 @@ CommandCost CmdSetGroupLivery(TileIndex tile, DoCommandFlag flags, uint32 p1, ui
 		MarkWholeScreenDirty();
 	}
 
+	return CommandCost();
+}
+
+void AddExistingAutoGroupsToNameMap(const VehicleType vt, std::map<std::string, Group*>& name_group_map)
+{
+
+	for (Group* g : Group::Iterate()) {
+		if (g->owner == _current_company && g->vehicle_type == vt) {
+
+			name_group_map[g->name] = g;
+		}
+	}
+}
+
+Group* CreateAutoGroup(const VehicleType vt, std::string name, std::map<std::string, Group*>& name_group_map, Group* parent)
+{
+	Group* g = nullptr;
+	if (Group::CanAllocateItem())
+	{
+		const Company* c = Company::Get(_current_company);
+
+		g = new Group(_current_company);
+
+		g->vehicle_type = vt;
+		g->parent = parent != nullptr ? parent->index : INVALID_GROUP;
+
+		g->livery.colour1 = c->livery[LS_DEFAULT].colour1;
+		g->livery.colour2 = c->livery[LS_DEFAULT].colour2;
+		if (c->settings.renew_keep_length) SetBit(g->flags, GroupFlags::GF_REPLACE_WAGON_REMOVAL);
+		
+		g->name = name;
+
+		name_group_map[name] = g;
+	}
+
+	return g;
+}
+
+Group* GetOrCreateAutoGroup(const VehicleType vt, std::string name, std::map<std::string, Group*>& name_group_map, Group* parent)
+{
+	if(name_group_map.find(name) != name_group_map.end())
+	{
+		return name_group_map[name];
+	}
+
+	return CreateAutoGroup(vt, name, name_group_map, parent);
+}
+
+/**
+ * Adds a vehicle to an auto group.
+ * @param v the vehicle
+ * @return the group to add the vehicle to.
+ */
+Group* AddVehicleToAutoGroup(Vehicle* v, Town* from, Town* to, std::map<std::string, Group*>& name_group_map)
+{
+	assert(from != nullptr);
+	char from_town_name[255];
+
+	GetTownName(from_town_name, from, from_town_name + 255);
+
+	std::string category_name = "*";
+	category_name += from_town_name;
+
+	Group* town_category = GetOrCreateAutoGroup(v->type, category_name, name_group_map, nullptr);
+	
+	if(from == to)
+	{
+	
+		char local_name[255];
+		GetString(local_name, STR_AUTO_GROUP_LOCAL_ROUTE, lastof(local_name));
+		std::string name = "  ";
+		name += from_town_name;
+
+		name += " ";
+		name += local_name;
+
+		Group* local = GetOrCreateAutoGroup(v->type, name, name_group_map, town_category);
+
+		return local;
+	}
+	else
+	{
+
+		char to_town_name[255];
+		std::string name = "  ";
+		name += from_town_name;
+		name += " to ";
+		GetTownName(to_town_name, to, to_town_name + 255);
+		name += to_town_name;
+
+		Group* route = GetOrCreateAutoGroup(v->type, name, name_group_map, town_category);
+
+		return route;
+
+	}
+	
+}
+
+/**
+ * Auto groups all ungrouped vehicles
+ * @param tile unused
+ * @param flags type of operation
+ * @param p1   vehicle type
+ * @param p2   parent groupid
+ * @param text unused
+ * @return the cost of this operation or an error
+ */
+CommandCost CmdAutoGroup(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char* text)
+{
+	VehicleType vt = Extract<VehicleType, 0, 3>(p1);
+	if (!IsCompanyBuildableVehicleType(vt)) return CMD_ERROR;
+
+	if (flags & DC_EXEC) {
+
+		const Company* c = Company::Get(_current_company);
+
+		std::map<std::string, Group*> name_group_map;
+
+		// Get existing groups into map for insertion of new vehicles
+		AddExistingAutoGroupsToNameMap(vt, name_group_map);
+
+		
+		for (Vehicle* v : Vehicle::Iterate()) {
+			// iterate every vehicle of vehicle type for this company
+			if (v->owner == _current_company && v->type == vt && v->group_id == DEFAULT_GROUP) {
+
+				// determine the from -> to cities
+				Order* fo = v->GetFirstOrder();
+				Order* lo = v->GetLastOrder();
+				Town* fromtown = nullptr;
+				if (fo != nullptr)
+				{
+					DestinationID dest = fo->GetDestination();
+					BaseStation* st = BaseStation::GetIfValid(dest);
+					if (st != nullptr)
+					{
+						fromtown = st->town;
+					}
+
+					if (fromtown == nullptr)
+					{
+						Depot* dp = Depot::GetIfValid(dest);
+
+						if (dp != nullptr)
+						{
+							fromtown = dp->town;
+						}
+
+					}
+
+				}
+				Town* totown = nullptr;
+				if (lo != nullptr)
+				{
+					DestinationID dest = lo->GetDestination();
+					BaseStation* st = BaseStation::GetIfValid(dest);
+					if (st != nullptr)
+					{
+						totown = st->town;
+					}
+
+					if (totown == nullptr)
+					{
+						Depot* dp = Depot::GetIfValid(dest);
+
+						if (dp != nullptr)
+						{
+							totown = dp->town;
+						}
+
+					}
+
+				}
+
+				Group* g = nullptr;
+				
+				if(fromtown != nullptr)
+					g = AddVehicleToAutoGroup(v, fromtown, totown, name_group_map);
+				
+
+				// did we get a valid group to place the vehicle in?
+				if (g != nullptr)
+				{
+					AddVehicleToGroup(v, g->index);
+
+					GroupStatistics::UpdateAutoreplace(v->owner);
+
+					/* Update the Replace Vehicle Windows */
+					SetWindowDirty(WC_REPLACE_VEHICLE, v->type);
+					SetWindowDirty(WC_VEHICLE_DEPOT, v->tile);
+					SetWindowDirty(WC_VEHICLE_VIEW, v->index);
+					SetWindowDirty(WC_VEHICLE_DETAILS, v->index);
+					InvalidateWindowData(WC_VEHICLE_VIEW, v->index);
+					InvalidateWindowData(WC_VEHICLE_DETAILS, v->index);
+
+				}
+		
+			}
+		
+		}
+
+		InvalidateWindowData(GetWindowClassForVehicleType(vt), VehicleListIdentifier(VL_GROUP_LIST, vt, _current_company).Pack());
+		InvalidateWindowData(WC_COMPANY_COLOUR, c->index, vt);
+	}
+
+	return CommandCost();
+}
+
+CommandCost CmdDeleteAutoGroup(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char* text)
+{
+	VehicleType vt = Extract<VehicleType, 0, 3>(p1);
+	if (flags & DC_EXEC) {
+		const Company* c = Company::Get(_current_company);
+		
+		for (Group* g : Group::Iterate()) {
+			if (g->owner == _current_company && g->vehicle_type == vt) {
+
+				if(g->name[0] == '*')
+				{
+
+					/* Remove all vehicles from the group */
+					DoCommand(0, p1, 0, flags, CMD_REMOVE_ALL_VEHICLES_GROUP);
+
+					/* Delete sub-groups */
+					for (const Group* gp : Group::Iterate()) {
+						if (gp->parent == g->index) {
+							DoCommand(0, gp->index, 0, flags, CMD_DELETE_GROUP);
+						}
+					}
+
+					
+					/* Update backupped orders if needed */
+					OrderBackup::ClearGroup(g->index);
+
+					/* If we set an autoreplace for the group we delete, remove it. */
+					if (_current_company < MAX_COMPANIES) {
+						Company* c;
+
+						c = Company::Get(_current_company);
+						for (EngineRenew* er : EngineRenew::Iterate()) {
+							if (er->group_id == g->index) RemoveEngineReplacementForCompany(c, er->from, g->index, flags);
+						}
+					}
+
+					VehicleType vt = g->vehicle_type;
+
+					/* Delete the Replace Vehicle Windows */
+					DeleteWindowById(WC_REPLACE_VEHICLE, g->vehicle_type);
+					delete g;
+
+					InvalidateWindowData(GetWindowClassForVehicleType(vt), VehicleListIdentifier(VL_GROUP_LIST, vt, _current_company).Pack());
+					InvalidateWindowData(WC_COMPANY_COLOUR, _current_company, vt);
+			
+
+				}
+			}
+		}
+	}
 	return CommandCost();
 }
 

@@ -187,6 +187,7 @@ CommandProc CmdAutoreplaceVehicle;
 CommandProc CmdDepotSellAllVehicles;
 CommandProc CmdDepotMassAutoReplace;
 
+
 CommandProc CmdCreateGroup;
 CommandProc CmdAlterGroup;
 CommandProc CmdDeleteGroup;
@@ -195,6 +196,9 @@ CommandProc CmdAddSharedVehicleGroup;
 CommandProc CmdRemoveAllVehiclesGroup;
 CommandProc CmdSetGroupFlag;
 CommandProc CmdSetGroupLivery;
+
+CommandProc CmdAutoGroup;
+CommandProc CmdDeleteAutoGroup;
 
 CommandProc CmdMoveOrder;
 CommandProc CmdChangeTimetable;
@@ -361,6 +365,8 @@ static const Command _command_proc_table[] = {
 	DEF_CMD(CmdRemoveAllVehiclesGroup,                         0, CMDT_ROUTE_MANAGEMENT      ), // CMD_REMOVE_ALL_VEHICLES_GROUP
 	DEF_CMD(CmdSetGroupFlag,                                   0, CMDT_ROUTE_MANAGEMENT      ), // CMD_SET_GROUP_FLAG
 	DEF_CMD(CmdSetGroupLivery,                                 0, CMDT_ROUTE_MANAGEMENT      ), // CMD_SET_GROUP_LIVERY
+	DEF_CMD(CmdAutoGroup,							   		   0,  CMDT_ROUTE_MANAGEMENT	   ), // CMD_AUTO_GROUP
+	DEF_CMD(CmdDeleteAutoGroup,								   0, CMDT_ROUTE_MANAGEMENT	   ), // CMD_AUTO_GROUP
 	DEF_CMD(CmdMoveOrder,                                      0, CMDT_ROUTE_MANAGEMENT      ), // CMD_MOVE_ORDER
 	DEF_CMD(CmdChangeTimetable,                                0, CMDT_ROUTE_MANAGEMENT      ), // CMD_CHANGE_TIMETABLE
 	DEF_CMD(CmdSetVehicleOnTime,                               0, CMDT_ROUTE_MANAGEMENT      ), // CMD_SET_VEHICLE_ON_TIME

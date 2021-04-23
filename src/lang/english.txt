@@ -5204,3 +5204,10 @@ STR_PLANE                                                       :{BLACK}{PLANE}
 STR_SHIP                                                        :{BLACK}{SHIP}
 
 STR_TOOLBAR_RAILTYPE_VELOCITY                                   :{STRING} ({VELOCITY})
+
+STR_AUTO_GROUP_LABEL											:{BLACK}Auto-group
+STR_AUTO_GROUP_TOOLTIP											:{BLACK}Auto group all ungrouped vehicles
+STR_AUTO_GROUP_DELETE_LABEL										:{BLACK}Delete Auto-groups
+STR_AUTO_GROUP_DELETE_TOOLTIP									:{BLACK}Delete all auto-groups
+STR_ERROR_CANT_AUTO_GROUP										:Failed to auto-group 
+STR_AUTO_GROUP_LOCAL_ROUTE										:Local

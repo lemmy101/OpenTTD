@@ -67,6 +67,11 @@ static const NWidgetPart _nested_group_widgets[] = {
 				NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_GL_REPLACE_PROTECTION),
 						SetDataTip(SPR_GROUP_REPLACE_OFF_TRAIN, STR_GROUP_REPLACE_PROTECTION_TOOLTIP),
 			EndContainer(),
+			NWidget(NWID_HORIZONTAL),
+				NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_GL_AUTO_GROUP), SetMinimalSize(81, 12), SetDataTip(STR_AUTO_GROUP_LABEL, STR_AUTO_GROUP_TOOLTIP),
+				NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_GL_DELETE_AUTO_GROUP), SetMinimalSize(81, 12), SetDataTip(STR_AUTO_GROUP_DELETE_LABEL, STR_AUTO_GROUP_DELETE_TOOLTIP),
+				NWidget(WWT_PANEL, COLOUR_GREY), SetFill(1, 1), EndContainer(),
+			EndContainer(),		
 		EndContainer(),
 		/* right part */
 		NWidget(NWID_VERTICAL),
@@ -204,7 +209,7 @@ private:
 		this->tiny_step_height = this->column_size[VGC_FOLD].height;
 
 		this->column_size[VGC_NAME] = maxdim(GetStringBoundingBox(STR_GROUP_DEFAULT_TRAINS + this->vli.vtype), GetStringBoundingBox(STR_GROUP_ALL_TRAINS + this->vli.vtype));
-		this->column_size[VGC_NAME].width = std::max(170u, this->column_size[VGC_NAME].width);
+		this->column_size[VGC_NAME].width = std::max(270u, this->column_size[VGC_NAME].width);
 		this->tiny_step_height = std::max(this->tiny_step_height, this->column_size[VGC_NAME].height);
 
 		this->column_size[VGC_PROTECT] = GetSpriteSize(SPR_GROUP_REPLACE_PROTECT);
@@ -761,6 +766,16 @@ public:
 				break;
 			}
 
+			case WID_GL_AUTO_GROUP:	{ // auto groups all vehicles
+
+				DoCommandP(0, this->vli.vtype, this->vli.index, CMD_AUTO_GROUP | CMD_MSG(STR_ERROR_CANT_AUTO_GROUP), CcAutoGroup);
+				break;
+
+			}
+			case WID_GL_DELETE_AUTO_GROUP:	{
+				DoCommandP(0, this->vli.vtype, this->vli.index, CMD_DELETE_AUTO_GROUP | CMD_MSG(STR_ERROR_CANT_AUTO_GROUP), CcAutoGroup);
+				break;
+			}
 			case WID_GL_CREATE_GROUP: { // Create a new group
 				DoCommandP(0, this->vli.vtype, this->vli.index, CMD_CREATE_GROUP | CMD_MSG(STR_ERROR_GROUP_CAN_T_CREATE), CcCreateGroup);
 				break;
@@ -1137,13 +1152,20 @@ static inline VehicleGroupWindow *FindVehicleGroupWindow(VehicleType vt, Owner o
  * @param cmd Unused.
  * @see CmdCreateGroup
  */
-void CcCreateGroup(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2, uint32 cmd)
+void CcCreateGroup(const CommandCost& result, TileIndex tile, uint32 p1, uint32 p2, uint32 cmd)
 {
 	if (result.Failed()) return;
 	assert(p1 <= VEH_AIRCRAFT);
 
-	VehicleGroupWindow *w = FindVehicleGroupWindow((VehicleType)p1, _current_company);
+	VehicleGroupWindow* w = FindVehicleGroupWindow((VehicleType)p1, _current_company);
 	if (w != nullptr) w->ShowRenameGroupWindow(_new_group_id, true);
+}
+
+void CcAutoGroup(const CommandCost& result, TileIndex tile, uint32 p1, uint32 p2, uint32 cmd)
+{
+	if (result.Failed()) return;
+	assert(p1 <= VEH_AIRCRAFT);
+
 }
 
 /**

@@ -726,12 +726,12 @@ Group* AddVehicleToAutoGroup(Vehicle* v, Town* from, Town* to, std::map<std::str
 
 	GetTownName(from_town_name, from, from_town_name + 255);
 
-	std::string category_name = "*";
+	std::string category_name = "* ";
 	category_name += from_town_name;
 
 	Group* town_category = GetOrCreateAutoGroup(v->type, category_name, name_group_map, nullptr);
 	
-	if(from == to)
+	if(from == to || to == nullptr)
 	{
 	
 		char local_name[255];
@@ -762,6 +762,47 @@ Group* AddVehicleToAutoGroup(Vehicle* v, Town* from, Town* to, std::map<std::str
 
 	}
 	
+}
+
+Town* GetTownFromDestination(DestinationID dest)
+{
+	Town* town = nullptr;
+	
+	BaseStation* st = BaseStation::GetIfValid(dest);
+	if (st != nullptr)
+	{
+		town = st->town;
+	}
+
+	return town;
+
+}
+
+void GetAutoGroupMostRelevantTowns(Vehicle* v, Town*& a, Town*& b)
+{
+	std::vector<Town*> uniqueDestinations;
+	
+	int num = v->GetNumOrders();
+	
+	for(int x=0;x<num;x++)
+	{
+		Order* order = v->GetOrder(x);
+
+		DestinationID dest = order->GetDestination();
+		Town* town = GetTownFromDestination(dest);
+		if( town != nullptr && uniqueDestinations.end() == std::find(uniqueDestinations.begin(), uniqueDestinations.end(), town))
+		{
+			uniqueDestinations.push_back(town);
+		}
+	}
+
+	if (uniqueDestinations.empty())
+		return;
+	
+	a = uniqueDestinations[0];
+	if (uniqueDestinations.size() > 1)
+		b = uniqueDestinations[uniqueDestinations.size() - 1];
+
 }
 
 /**
@@ -795,51 +836,12 @@ CommandCost CmdAutoGroup(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 				// determine the from -> to cities
 				Order* fo = v->GetFirstOrder();
 				Order* lo = v->GetLastOrder();
+
 				Town* fromtown = nullptr;
-				if (fo != nullptr)
-				{
-					DestinationID dest = fo->GetDestination();
-					BaseStation* st = BaseStation::GetIfValid(dest);
-					if (st != nullptr)
-					{
-						fromtown = st->town;
-					}
-
-					if (fromtown == nullptr)
-					{
-						Depot* dp = Depot::GetIfValid(dest);
-
-						if (dp != nullptr)
-						{
-							fromtown = dp->town;
-						}
-
-					}
-
-				}
 				Town* totown = nullptr;
-				if (lo != nullptr)
-				{
-					DestinationID dest = lo->GetDestination();
-					BaseStation* st = BaseStation::GetIfValid(dest);
-					if (st != nullptr)
-					{
-						totown = st->town;
-					}
 
-					if (totown == nullptr)
-					{
-						Depot* dp = Depot::GetIfValid(dest);
-
-						if (dp != nullptr)
-						{
-							totown = dp->town;
-						}
-
-					}
-
-				}
-
+				GetAutoGroupMostRelevantTowns(v, fromtown, totown);
+				
 				Group* g = nullptr;
 				
 				if(fromtown != nullptr)

@@ -388,7 +388,7 @@ static void CheckPauseHelper(bool pause, PauseMode pm)
 {
 	if (pause == ((_pause_mode & pm) != PM_UNPAUSED)) return;
 
-	DoCommandP(0, pm, pause ? 1 : 0, CMD_PAUSE);
+	DoCommandP(0, pm, pause ? 1 : 0, 0, CMD_PAUSE);
 }
 
 /**

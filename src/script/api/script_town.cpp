@@ -51,7 +51,7 @@
 	}
 	EnforcePrecondition(false, IsValidTown(town_id));
 
-	return ScriptObject::DoCommand(0, town_id, 0, CMD_RENAME_TOWN, text);
+	return ScriptObject::DoCommand(0, town_id, 0, 0, CMD_RENAME_TOWN, text);
 }
 
 /* static */ bool ScriptTown::SetText(TownID town_id, Text *text)
@@ -65,7 +65,7 @@
 	}
 	EnforcePrecondition(false, IsValidTown(town_id));
 
-	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, 0, CMD_TOWN_SET_TEXT, encoded_text);
+	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, 0, 0, CMD_TOWN_SET_TEXT, encoded_text);
 }
 
 /* static */ int32 ScriptTown::GetPopulation(TownID town_id)
@@ -133,7 +133,7 @@
 	EnforcePrecondition(false, IsValidTown(town_id));
 	EnforcePrecondition(false, ScriptCargo::IsValidTownEffect(towneffect_id));
 
-	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id | (towneffect_id << 16), goal, CMD_TOWN_CARGO_GOAL);
+	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id | (towneffect_id << 16), goal, 0, CMD_TOWN_CARGO_GOAL);
 }
 
 /* static */ uint32 ScriptTown::GetCargoGoal(TownID town_id, ScriptCargo::TownEffect towneffect_id)
@@ -176,7 +176,7 @@
 			break;
 	}
 
-	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, growth_rate, CMD_TOWN_GROWTH_RATE);
+	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, growth_rate, 0, CMD_TOWN_GROWTH_RATE);
 }
 
 /* static */ int32 ScriptTown::GetGrowthRate(TownID town_id)
@@ -266,7 +266,7 @@
 	EnforcePrecondition(false, IsValidTown(town_id));
 	EnforcePrecondition(false, IsActionAvailable(town_id, town_action));
 
-	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, town_action, CMD_DO_TOWN_ACTION);
+	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, town_action, 0, CMD_DO_TOWN_ACTION);
 }
 
 /* static */ bool ScriptTown::ExpandTown(TownID town_id, int houses)
@@ -275,7 +275,7 @@
 	EnforcePrecondition(false, IsValidTown(town_id));
 	EnforcePrecondition(false, houses > 0);
 
-	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, houses, CMD_EXPAND_TOWN);
+	return ScriptObject::DoCommand(::Town::Get(town_id)->xy, town_id, houses, 0, CMD_EXPAND_TOWN);
 }
 
 /* static */ bool ScriptTown::FoundTown(TileIndex tile, TownSize size, bool city, RoadLayout layout, Text *name)
@@ -305,7 +305,7 @@
 		return false;
 	}
 
-	return ScriptObject::DoCommand(tile, size | (city ? 1 << 2 : 0) | layout << 3, townnameparts, CMD_FOUND_TOWN, text);
+	return ScriptObject::DoCommand(tile, size | (city ? 1 << 2 : 0) | layout << 3, townnameparts, 0, CMD_FOUND_TOWN, text);
 }
 
 /* static */ ScriptTown::TownRating ScriptTown::GetRating(TownID town_id, ScriptCompany::CompanyID company_id)
@@ -360,7 +360,7 @@
 	uint16 p2 = 0;
 	memcpy(&p2, &new_rating, sizeof(p2));
 
-	return ScriptObject::DoCommand(0, town_id | (company_id << 16), p2, CMD_TOWN_RATING);
+	return ScriptObject::DoCommand(0, town_id | (company_id << 16), p2, 0, CMD_TOWN_RATING);
 }
 
 /* static */ int ScriptTown::GetAllowedNoise(TownID town_id)

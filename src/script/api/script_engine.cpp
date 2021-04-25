@@ -285,7 +285,7 @@
 	EnforcePrecondition(false, IsValidEngine(engine_id));
 	EnforcePrecondition(false, company != ScriptCompany::COMPANY_INVALID);
 
-	return ScriptObject::DoCommand(0, engine_id, (uint32)company | (1 << 31), CMD_ENGINE_CTRL);
+	return ScriptObject::DoCommand(0, engine_id, (uint32)company | (1 << 31), 0, CMD_ENGINE_CTRL);
 }
 
 /* static */ bool ScriptEngine::DisableForCompany(EngineID engine_id, ScriptCompany::CompanyID company)
@@ -296,5 +296,5 @@
 	EnforcePrecondition(false, IsValidEngine(engine_id));
 	EnforcePrecondition(false, company != ScriptCompany::COMPANY_INVALID);
 
-	return ScriptObject::DoCommand(0, engine_id, company, CMD_ENGINE_CTRL);
+	return ScriptObject::DoCommand(0, engine_id, company, 0, CMD_ENGINE_CTRL);
 }

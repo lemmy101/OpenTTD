@@ -110,12 +110,12 @@ int32 ScriptEventEnginePreview::GetVehicleType()
 bool ScriptEventEnginePreview::AcceptPreview()
 {
 	if (!this->IsEngineValid()) return false;
-	return ScriptObject::DoCommand(0, this->engine, 0, CMD_WANT_ENGINE_PREVIEW);
+	return ScriptObject::DoCommand(0, this->engine, 0, 0, CMD_WANT_ENGINE_PREVIEW);
 }
 
 bool ScriptEventCompanyAskMerger::AcceptMerger()
 {
-	return ScriptObject::DoCommand(0, this->owner, 0, CMD_BUY_COMPANY);
+	return ScriptObject::DoCommand(0, this->owner, 0, 0, CMD_BUY_COMPANY);
 }
 
 ScriptEventAdminPort::ScriptEventAdminPort(const char *json) :

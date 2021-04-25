@@ -59,7 +59,7 @@
 	}
 	EnforcePrecondition(false, IsValidIndustry(industry_id));
 
-	return ScriptObject::DoCommand(0, industry_id, static_cast<uint32>(IndustryAction::SetText), CMD_INDUSTRY_CTRL, encoded_text);
+	return ScriptObject::DoCommand(0, industry_id, static_cast<uint32>(IndustryAction::SetText), 0, CMD_INDUSTRY_CTRL, encoded_text);
 }
 
 /* static */ ScriptIndustry::CargoAcceptState ScriptIndustry::IsCargoAccepted(IndustryID industry_id, CargoID cargo_id)
@@ -257,7 +257,7 @@ bool ScriptIndustry::SetControlFlags(IndustryID industry_id, uint32 control_flag
 	if (ScriptObject::GetCompany() != OWNER_DEITY) return false;
 	if (!IsValidIndustry(industry_id)) return false;
 
-	return ScriptObject::DoCommand(0, industry_id, 0 | ((control_flags & ::INDCTL_MASK) << 8), CMD_INDUSTRY_CTRL);
+	return ScriptObject::DoCommand(0, industry_id, 0 | ((control_flags & ::INDCTL_MASK) << 8), 0, CMD_INDUSTRY_CTRL);
 }
 
 /* static */ ScriptCompany::CompanyID ScriptIndustry::GetExclusiveSupplier(IndustryID industry_id)
@@ -276,7 +276,7 @@ bool ScriptIndustry::SetControlFlags(IndustryID industry_id, uint32 control_flag
 
 	auto company = ScriptCompany::ResolveCompanyID(company_id);
 	::Owner owner = (company == ScriptCompany::COMPANY_INVALID ? ::INVALID_OWNER : (::Owner)company);
-	return ScriptObject::DoCommand(0, industry_id, 1 | (((uint8)owner) << 16), CMD_INDUSTRY_CTRL);
+	return ScriptObject::DoCommand(0, industry_id, 1 | (((uint8)owner) << 16), 0, CMD_INDUSTRY_CTRL);
 }
 
 /* static */ ScriptCompany::CompanyID ScriptIndustry::GetExclusiveConsumer(IndustryID industry_id)
@@ -295,5 +295,5 @@ bool ScriptIndustry::SetControlFlags(IndustryID industry_id, uint32 control_flag
 
 	auto company = ScriptCompany::ResolveCompanyID(company_id);
 	::Owner owner = (company == ScriptCompany::COMPANY_INVALID ? ::INVALID_OWNER : (::Owner)company);
-	return ScriptObject::DoCommand(0, industry_id, 2 | (((uint8)owner) << 16), CMD_INDUSTRY_CTRL);
+	return ScriptObject::DoCommand(0, industry_id, 2 | (((uint8)owner) << 16), 0, CMD_INDUSTRY_CTRL);
 }

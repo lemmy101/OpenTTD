@@ -543,7 +543,7 @@ public:
 	{
 		ObjectClass *objclass = ObjectClass::Get(_selected_object_class);
 		DoCommandP(tile, objclass->GetSpec(_selected_object_index)->Index(),
-				_selected_object_view, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_OBJECT), CcTerraform);
+				_selected_object_view, 0, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_OBJECT), CcTerraform);
 	}
 
 	void OnPlaceObjectAbort() override

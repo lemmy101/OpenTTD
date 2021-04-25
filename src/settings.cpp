@@ -1891,7 +1891,7 @@ const SettingDesc *GetSettingDescription(uint index)
  * @return the cost of this operation or an error
  * @see _settings
  */
-CommandCost CmdChangeSetting(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text)
+CommandCost CmdChangeSetting(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, uint64 p3, const char *text)
 {
 	const SettingDesc *sd = GetSettingDescription(p1);
 
@@ -1940,7 +1940,7 @@ CommandCost CmdChangeSetting(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
  * @param text unused
  * @return the cost of this operation or an error
  */
-CommandCost CmdChangeCompanySetting(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text)
+CommandCost CmdChangeCompanySetting(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, uint64 p3, const char *text)
 {
 	if (p1 >= lengthof(_company_settings)) return CMD_ERROR;
 	const SettingDesc *sd = &_company_settings[p1];
@@ -2007,7 +2007,7 @@ bool SetSettingValue(uint index, int32 value, bool force_newgame)
 
 	/* send non-company-based settings over the network */
 	if (!_networking || (_networking && _network_server)) {
-		return DoCommandP(0, index, value, CMD_CHANGE_SETTING);
+		return DoCommandP(0, index, value, 0, CMD_CHANGE_SETTING);
 	}
 	return false;
 }
@@ -2022,7 +2022,7 @@ void SetCompanySetting(uint index, int32 value)
 {
 	const SettingDesc *sd = &_company_settings[index];
 	if (Company::IsValidID(_local_company) && _game_mode != GM_MENU) {
-		DoCommandP(0, index, value, CMD_CHANGE_COMPANY_SETTING);
+		DoCommandP(0, index, value, 0, CMD_CHANGE_COMPANY_SETTING);
 	} else {
 		void *var = GetVariableAddress(&_settings_client.company, &sd->save);
 		Write_ValidateSetting(var, sd, value);
@@ -2055,7 +2055,7 @@ void SyncCompanySettings()
 		const void *new_var = GetVariableAddress(&_settings_client.company, &sd->save);
 		uint32 old_value = (uint32)ReadValue(old_var, sd->save.conv);
 		uint32 new_value = (uint32)ReadValue(new_var, sd->save.conv);
-		if (old_value != new_value) NetworkSendCommand(0, i, new_value, CMD_CHANGE_COMPANY_SETTING, nullptr, nullptr, _local_company);
+		if (old_value != new_value) NetworkSendCommand(0, i, new_value, 0, CMD_CHANGE_COMPANY_SETTING, nullptr, nullptr, _local_company);
 	}
 }
 

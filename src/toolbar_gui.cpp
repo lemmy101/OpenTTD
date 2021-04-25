@@ -269,7 +269,7 @@ static CallBackFunction ToolbarPauseClick(Window *w)
 {
 	if (_networking && !_network_server) return CBF_NONE; // only server can pause the game
 
-	if (DoCommandP(0, PM_PAUSED_NORMAL, _pause_mode == PM_UNPAUSED, CMD_PAUSE)) {
+	if (DoCommandP(0, PM_PAUSED_NORMAL, _pause_mode == PM_UNPAUSED, 0, CMD_PAUSE)) {
 		if (_settings_client.sound.confirm) SndPlayFx(SND_15_BEEP);
 	}
 	return CBF_NONE;
@@ -614,9 +614,9 @@ static CallBackFunction MenuClickCompany(int index)
 
 			case CTMN_NEW_COMPANY:
 				if (_network_server) {
-					DoCommandP(0, CCA_NEW, _network_own_client_id, CMD_COMPANY_CTRL);
+					DoCommandP(0, CCA_NEW, _network_own_client_id, 0, CMD_COMPANY_CTRL);
 				} else {
-					NetworkSendCommand(0, CCA_NEW, 0, CMD_COMPANY_CTRL, nullptr, nullptr, _local_company);
+					NetworkSendCommand(0, CCA_NEW, 0, 0, CMD_COMPANY_CTRL, nullptr, nullptr, _local_company);
 				}
 				return CBF_NONE;
 

@@ -646,6 +646,7 @@ NetworkRecvStatus ServerNetworkAdminSocketHandler::SendCmdLogging(ClientID clien
 	p->Send_uint16(cp->cmd & CMD_ID_MASK);
 	p->Send_uint32(cp->p1);
 	p->Send_uint32(cp->p2);
+	p->Send_uint64(cp->p3);
 	p->Send_uint32(cp->tile);
 	p->Send_string(cp->text);
 	p->Send_uint32(cp->frame);

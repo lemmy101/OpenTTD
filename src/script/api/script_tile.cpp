@@ -238,7 +238,7 @@
 	EnforcePrecondition(false, ScriptObject::GetCompany() != OWNER_DEITY);
 	EnforcePrecondition(false, tile < ::MapSize());
 
-	return ScriptObject::DoCommand(tile, slope, 1, CMD_TERRAFORM_LAND);
+	return ScriptObject::DoCommand(tile, slope, 1, 0, CMD_TERRAFORM_LAND);
 }
 
 /* static */ bool ScriptTile::LowerTile(TileIndex tile, int32 slope)
@@ -246,7 +246,7 @@
 	EnforcePrecondition(false, ScriptObject::GetCompany() != OWNER_DEITY);
 	EnforcePrecondition(false, tile < ::MapSize());
 
-	return ScriptObject::DoCommand(tile, slope, 0, CMD_TERRAFORM_LAND);
+	return ScriptObject::DoCommand(tile, slope, 0, 0, CMD_TERRAFORM_LAND);
 }
 
 /* static */ bool ScriptTile::LevelTiles(TileIndex start_tile, TileIndex end_tile)
@@ -255,14 +255,14 @@
 	EnforcePrecondition(false, start_tile < ::MapSize());
 	EnforcePrecondition(false, end_tile < ::MapSize());
 
-	return ScriptObject::DoCommand(end_tile, start_tile, LM_LEVEL << 1, CMD_LEVEL_LAND);
+	return ScriptObject::DoCommand(end_tile, start_tile, LM_LEVEL << 1, 0, CMD_LEVEL_LAND);
 }
 
 /* static */ bool ScriptTile::DemolishTile(TileIndex tile)
 {
 	EnforcePrecondition(false, ::IsValidTile(tile));
 
-	return ScriptObject::DoCommand(tile, 0, 0, CMD_LANDSCAPE_CLEAR);
+	return ScriptObject::DoCommand(tile, 0, 0, 0, CMD_LANDSCAPE_CLEAR);
 }
 
 /* static */ bool ScriptTile::PlantTree(TileIndex tile)
@@ -270,7 +270,7 @@
 	EnforcePrecondition(false, ScriptObject::GetCompany() != OWNER_DEITY);
 	EnforcePrecondition(false, ::IsValidTile(tile));
 
-	return ScriptObject::DoCommand(tile, TREE_INVALID, tile, CMD_PLANT_TREE);
+	return ScriptObject::DoCommand(tile, TREE_INVALID, tile, 0, CMD_PLANT_TREE);
 }
 
 /* static */ bool ScriptTile::PlantTreeRectangle(TileIndex tile, uint width, uint height)
@@ -281,7 +281,7 @@
 	EnforcePrecondition(false, height >= 1 && height <= 20);
 	TileIndex end_tile = tile + ::TileDiffXY(width - 1, height - 1);
 
-	return ScriptObject::DoCommand(tile, TREE_INVALID, end_tile, CMD_PLANT_TREE);
+	return ScriptObject::DoCommand(tile, TREE_INVALID, end_tile, 0, CMD_PLANT_TREE);
 }
 
 /* static */ bool ScriptTile::IsWithinTownInfluence(TileIndex tile, TownID town_id)

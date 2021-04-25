@@ -45,7 +45,7 @@
 	if ((sd->save.conv & SLF_NO_NETWORK_SYNC) != 0) return false;
 	if (sd->desc.cmd != SDT_BOOLX && sd->desc.cmd != SDT_NUMX) return false;
 
-	return ScriptObject::DoCommand(0, index, value, CMD_CHANGE_SETTING);
+	return ScriptObject::DoCommand(0, index, value, 0, CMD_CHANGE_SETTING);
 }
 
 /* static */ bool ScriptGameSettings::IsDisabledVehicleType(ScriptVehicle::VehicleType vehicle_type)

@@ -622,7 +622,7 @@ DEF_CONSOLE_CMD(ConPauseGame)
 	}
 
 	if ((_pause_mode & PM_PAUSED_NORMAL) == PM_UNPAUSED) {
-		DoCommandP(0, PM_PAUSED_NORMAL, 1, CMD_PAUSE);
+		DoCommandP(0, PM_PAUSED_NORMAL, 1, 0, CMD_PAUSE);
 		if (!_networking) IConsolePrint(CC_DEFAULT, "Game paused.");
 	} else {
 		IConsolePrint(CC_DEFAULT, "Game is already paused.");
@@ -639,7 +639,7 @@ DEF_CONSOLE_CMD(ConUnpauseGame)
 	}
 
 	if ((_pause_mode & PM_PAUSED_NORMAL) != PM_UNPAUSED) {
-		DoCommandP(0, PM_PAUSED_NORMAL, 0, CMD_PAUSE);
+		DoCommandP(0, PM_PAUSED_NORMAL, 0, 0, CMD_PAUSE);
 		if (!_networking) IConsolePrint(CC_DEFAULT, "Game unpaused.");
 	} else if ((_pause_mode & PM_PAUSED_ERROR) != PM_UNPAUSED) {
 		IConsolePrint(CC_DEFAULT, "Game is in error state and cannot be unpaused via console.");
@@ -854,7 +854,7 @@ DEF_CONSOLE_CMD(ConResetCompany)
 	}
 
 	/* It is safe to remove this company */
-	DoCommandP(0, CCA_DELETE | index << 16 | CRR_MANUAL << 24, 0, CMD_COMPANY_CTRL);
+	DoCommandP(0, CCA_DELETE | index << 16 | CRR_MANUAL << 24, 0, 0, CMD_COMPANY_CTRL);
 	IConsolePrint(CC_DEFAULT, "Company deleted.");
 
 	return true;
@@ -1237,7 +1237,7 @@ DEF_CONSOLE_CMD(ConStartAI)
 	}
 
 	/* Start a new AI company */
-	DoCommandP(0, CCA_NEW_AI | INVALID_COMPANY << 16, 0, CMD_COMPANY_CTRL);
+	DoCommandP(0, CCA_NEW_AI | INVALID_COMPANY << 16, 0, 0, CMD_COMPANY_CTRL);
 
 	return true;
 }
@@ -1273,8 +1273,8 @@ DEF_CONSOLE_CMD(ConReloadAI)
 	}
 
 	/* First kill the company of the AI, then start a new one. This should start the current AI again */
-	DoCommandP(0, CCA_DELETE | company_id << 16 | CRR_MANUAL << 24, 0, CMD_COMPANY_CTRL);
-	DoCommandP(0, CCA_NEW_AI | company_id << 16, 0, CMD_COMPANY_CTRL);
+	DoCommandP(0, CCA_DELETE | company_id << 16 | CRR_MANUAL << 24, 0, 0, CMD_COMPANY_CTRL);
+	DoCommandP(0, CCA_NEW_AI | company_id << 16, 0, 0, CMD_COMPANY_CTRL);
 	IConsolePrint(CC_DEFAULT, "AI reloaded.");
 
 	return true;
@@ -1311,7 +1311,7 @@ DEF_CONSOLE_CMD(ConStopAI)
 	}
 
 	/* Now kill the company of the AI. */
-	DoCommandP(0, CCA_DELETE | company_id << 16 | CRR_MANUAL << 24, 0, CMD_COMPANY_CTRL);
+	DoCommandP(0, CCA_DELETE | company_id << 16 | CRR_MANUAL << 24, 0, 0, CMD_COMPANY_CTRL);
 	IConsolePrint(CC_DEFAULT, "AI stopped, company deleted.");
 
 	return true;

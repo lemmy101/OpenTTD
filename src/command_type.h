@@ -444,7 +444,7 @@ enum CommandPauseLevel {
  * @param text Additional text
  * @return The CommandCost of the command, which can be succeeded or failed.
  */
-typedef CommandCost CommandProc(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text);
+typedef CommandCost CommandProc(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, uint64 p3, const char *text);
 
 /**
  * Define a command with the flags which belongs to it.
@@ -472,7 +472,7 @@ struct Command {
  * @param p1 Additional data of the command
  * @see CommandProc
  */
-typedef void CommandCallback(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2, uint32 cmd);
+typedef void CommandCallback(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2, uint64 p3, uint32 cmd);
 
 /**
  * Structure for buffering the build command when selecting a station to join.
@@ -481,6 +481,7 @@ struct CommandContainer {
 	TileIndex tile;                  ///< tile command being executed on.
 	uint32 p1;                       ///< parameter p1.
 	uint32 p2;                       ///< parameter p2.
+	uint64 p3;                       ///< parameter p3.
 	uint32 cmd;                      ///< command being executed.
 	CommandCallback *callback;       ///< any callback function executed upon successful completion of the command.
 	char text[32 * MAX_CHAR_LENGTH]; ///< possible text sent for name changes etc, in bytes including '\0'.

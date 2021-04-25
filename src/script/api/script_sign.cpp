@@ -41,7 +41,7 @@
 	EnforcePreconditionEncodedText(false, text);
 	EnforcePreconditionCustomError(false, ::Utf8StringLength(text) < MAX_LENGTH_SIGN_NAME_CHARS, ScriptError::ERR_PRECONDITION_STRING_TOO_LONG);
 
-	return ScriptObject::DoCommand(0, sign_id, 0, CMD_RENAME_SIGN, text);
+	return ScriptObject::DoCommand(0, sign_id, 0, 0, CMD_RENAME_SIGN, text);
 }
 
 /* static */ char *ScriptSign::GetName(SignID sign_id)
@@ -63,7 +63,7 @@
 /* static */ bool ScriptSign::RemoveSign(SignID sign_id)
 {
 	EnforcePrecondition(false, IsValidSign(sign_id));
-	return ScriptObject::DoCommand(0, sign_id, 0, CMD_RENAME_SIGN, "");
+	return ScriptObject::DoCommand(0, sign_id, 0, 0, CMD_RENAME_SIGN, "");
 }
 
 /* static */ SignID ScriptSign::BuildSign(TileIndex location, Text *name)
@@ -76,7 +76,7 @@
 	EnforcePreconditionEncodedText(INVALID_SIGN, text);
 	EnforcePreconditionCustomError(INVALID_SIGN, ::Utf8StringLength(text) < MAX_LENGTH_SIGN_NAME_CHARS, ScriptError::ERR_PRECONDITION_STRING_TOO_LONG);
 
-	if (!ScriptObject::DoCommand(location, 0, 0, CMD_PLACE_SIGN, text, &ScriptInstance::DoCommandReturnSignID)) return INVALID_SIGN;
+	if (!ScriptObject::DoCommand(location, 0, 0, 0, CMD_PLACE_SIGN, text, &ScriptInstance::DoCommandReturnSignID)) return INVALID_SIGN;
 
 	/* In case of test-mode, we return SignID 0 */
 	return 0;
